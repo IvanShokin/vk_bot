@@ -18,6 +18,7 @@ def new_mess(user_id, mes_for_user):
                'random_id': randint(0, 1000000000)})
 
 
+print("Начали")
 for event in longpoll.listen():
 
     # Если пришло новое сообщение и если оно для меня( то есть бота)
@@ -41,5 +42,15 @@ for event in longpoll.listen():
             new_mess(event.user_id, response_mess)
 
         elif event.text == 'Начать':
-            user = User(event.user_id, new_user=True)
+            user = User(event.user_id)
             new_mess(event.user_id, menu)
+
+        with open(f"{event.user_id}.json", "w") as file_user:
+            user_dict = {
+                'money': user.money,
+                'bet': user.bet,
+                'box': user.box,
+                'true_answer': user.true_answer,
+                'condition': user.condition,
+            }
+            json.dump(user_dict, file_user)

@@ -1,32 +1,21 @@
 from random import randint
 import json
 
-menu = "Меню\n" \
-       "1 - Начать игру\n" \
-       "2 - Мой кошелек\n" \
-       "3 - Изменить ставку\n" \
-       "4 - Изменить количество коробок\n"
+menu = "МЕНЮ\n" \
+       "Начать игру\n" \
+       "Мой кошелек\n" \
+       "Изменить ставку\n" \
+       "Изменить количество коробок\n"
 
 
 class User:
-    def __init__(self, id_user, money=100, bet=10, box=4, true_answer=None, condition='menu', new_user=False):
+    def __init__(self, id_user, money=100, bet=10, box=4, true_answer=None, condition='menu'):
         self.id_user = id_user
         self.money = money
         self.bet = bet
         self.box = box
         self.true_answer = true_answer
         self.condition = condition
-
-        if new_user:
-            with open(f"{id_user}.json", "w") as file_user:
-                user_dict = {
-                    'money': money,
-                    'bet': bet,
-                    'box': box,
-                    'true_answer': true_answer,
-                    'condition': condition,
-                }
-                json.dump(user_dict, file_user)
 
     def menu(self, new_mess):
         command = {
@@ -45,17 +34,17 @@ class User:
         self.true_answer = randint(1, self.box)
         mess = ''
         for box_i in range(self.box):
-            mess += f'{box_i} Box\n'
+            mess += f'{box_i+1} Box\n'
         return mess
 
     def answer(self, user_answer):
         self.condition = 'menu'
-        if user_answer == self.true_answer:
+        if int(user_answer) == self.true_answer:
             self.money += self.bet * self.box
-            return f'Вы выиграли {self.bet * self.box} монет!'
+            return f'Вы выиграли {self.bet * self.box} монет!\n{menu}'
         else:
             self.money -= self.bet * self.box
-            return 'Вы проиграли ('
+            return f'Вы проиграли (\n{menu}'
 
     def new_bet(self):
         self.condition = 'new_bet'
