@@ -6,7 +6,7 @@ import json
 from os.path import isfile
 
 
-token = "dda4bbad0100bbce1899e2ab3a63e6ef4e54d3848eef2402566e3dd2efdbe3b613e2d2cca23efc945afb3"
+token = "f5877695c99c7eabe836490eae06ac1fb223b00492e03f9283c0e6d25354105d53870f3190ddf8ec3701b"
 vk = vk_api.VkApi(token=token)
 longpoll = VkLongPoll(vk)
 
