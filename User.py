@@ -74,3 +74,5 @@ class User:
 
         return all_condition.get(self.condition)(new_mess)
 
+    print(":=)")
+
