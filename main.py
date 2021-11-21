@@ -6,7 +6,12 @@ from json import load, dump
 from os.path import isfile
 
 
-token = "f5877695c99c7eabe836490eae06ac1fb223b00492e03f9283c0e6d25354105d53870f3190ddf8ec3701b"
+with open('config.json', 'r') as file:
+    config = load(file)
+
+token = config.get('token')
+
+
 vk = vk_api.VkApi(token=token)
 longpoll = VkLongPoll(vk)
 
@@ -30,41 +35,39 @@ def save(file_save, user_save):
         dump(user_dict, file_user)
 
 
-requests_response = {
-    '1488': 'Осуждаю',
-    'Привет': 'Привет! Рады тебя видеть на нашем канале! Подписывайся на группу, у нас тут азино 777!',
-    'Я не хочу читать код, я хочу писать сообщения в словарь': 'Никита, так нельзя делать(',
-}
+with open('requests_response.json', 'r') as file:
+    requests_response = load(file)
 
 
-print("Начали")
-for event in longpoll.listen():
+if __name__ == '__main__':
+    print("Начали")
+    for event in longpoll.listen():
 
-    # Если пришло новое сообщение и если оно для меня( то есть бота)
-    if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+        # Если пришло новое сообщение и если оно для меня( то есть бота)
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
 
-        # Полное имя пользователя
-        user = vk.method("users.get", {"user_ids": event.user_id})
-        fullname = user[0]['first_name'] + ' ' + user[0]['last_name']
+            # Полное имя пользователя
+            user = vk.method("users.get", {"user_ids": event.user_id})
+            fullname = user[0]['first_name'] + ' ' + user[0]['last_name']
 
-        json_file_name = f'{event.user_id}.json'
+            json_file_name = f'{event.user_id}.json'
 
-        response = requests_response.get(event.text)
-        if response:
-            new_mess(event.user_id, response)
-        elif isfile(json_file_name):
-            with open(json_file_name, "r") as user_file:
-                dict_user = load(user_file)
+            response = requests_response.get(event.text)
+            if response:
+                new_mess(event.user_id, response)
+            elif isfile(json_file_name):
+                with open(json_file_name, "r") as user_file:
+                    dict_user = load(user_file)
 
-            all_features = 'money', 'bet', 'box', 'true_answer', 'condition'
-            money, bet, box, true_answer, condition = [dict_user.get(features) for features in all_features]
+                all_features = 'money', 'bet', 'box', 'true_answer', 'condition'
+                money, bet, box, true_answer, condition = [dict_user.get(features) for features in all_features]
 
-            user = User(event.user_id, money, bet, box, true_answer, condition)
+                user = User(event.user_id, money, bet, box, true_answer, condition)
 
-            response_mess = user.response(event.message)
-            new_mess(event.user_id, response_mess)
-            save(json_file_name, user)
-        elif event.text == 'Начать':
-            user = User(event.user_id)
-            new_mess(event.user_id, menu)
-            save(json_file_name, user)
+                response_mess = user.response(event.message)
+                new_mess(event.user_id, response_mess)
+                save(json_file_name, user)
+            elif event.text == 'Начать':
+                user = User(event.user_id)
+                new_mess(event.user_id, menu)
+                save(json_file_name, user)

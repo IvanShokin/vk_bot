@@ -42,7 +42,7 @@ class User:
             self.money += self.bet * self.box
             return f'Вы выиграли {self.bet * self.box} монет!\n{menu}'
         else:
-            self.money -= self.bet * self.box
+            self.money -= self.bet
             return f'Вы проиграли (\n{menu}'
 
     def new_bet(self):
