@@ -1,8 +1,8 @@
 from random import randint
-import json
 
 menu = "МЕНЮ\n" \
        "Начать игру\n" \
+       "💰 Испытать удачу\n" \
        "Мой кошелек\n" \
        "Изменить ставку\n" \
        "Изменить количество коробок\n"
@@ -21,6 +21,7 @@ class User:
         command = {
             'Начать игру': self.game,
             'Мой кошелек': str(self.money),
+            "Испытать удачу": self.luck,
             'Изменить ставку': self.new_bet,
             'Изменить количество коробок': self.new_box_quantity
         }
@@ -43,7 +44,7 @@ class User:
             self.money += self.bet * self.box
             return f'Вы выиграли {self.bet * self.box} монет!\n{menu}'
         else:
-            self.money -= self.bet * self.box
+            self.money -= self.bet
             return f'Вы проиграли (\n{menu}'
 
     def new_bet(self):
@@ -64,6 +65,14 @@ class User:
         self.box = int(new_box_quantity)
         return 'Меню'
 
+    def luck(self):
+        if randint(1, 2) == 1:
+            self.money += self.bet
+            return f'Вы выиграли {self.bet}!'
+        else:
+            self.money -= self.bet
+            return f'Вы проиграли {self.bet}'
+
     def response(self, new_mess):
         all_condition = {
             'menu': self.menu,
@@ -73,4 +82,3 @@ class User:
         }
 
         return all_condition.get(self.condition)(new_mess)
-

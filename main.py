@@ -1,12 +1,17 @@
-from User import User, menu
+from bot import User, menu
 from random import randint
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
-import json
+from json import load, dump
 from os.path import isfile
 
 
-token = "dda4bbad0100bbce1899e2ab3a63e6ef4e54d3848eef2402566e3dd2efdbe3b613e2d2cca23efc945afb3"
+with open('config.json', 'r') as file:
+    config = load(file)
+
+token = config.get('token')
+
+
 vk = vk_api.VkApi(token=token)
 longpoll = VkLongPoll(vk)
 
@@ -16,6 +21,22 @@ def new_mess(user_id, mes_for_user):
               {'user_id': user_id,
                'message': mes_for_user,
                'random_id': randint(0, 1000000000)})
+
+
+def save(user_save):
+    with open(f'{user_save.id_user}.json', "w") as file_user:
+        user_dict = {
+            'money': user_save.money,
+            'bet': user_save.bet,
+            'box': user_save.box,
+            'true_answer': user_save.true_answer,
+            'condition': user_save.condition,
+        }
+        dump(user_dict, file_user)
+
+
+with open('requests_response.json', 'r') as file:
+    requests_response = load(file)
 
 
 print("Начали")
@@ -29,9 +50,13 @@ for event in longpoll.listen():
         fullname = user[0]['first_name'] + ' ' + user[0]['last_name']
 
         json_file_name = f'{event.user_id}.json'
-        if isfile(json_file_name):
+
+        response = requests_response.get(event.text)
+        if response:
+            new_mess(event.user_id, response)
+        elif isfile(json_file_name):
             with open(json_file_name, "r") as user_file:
-                dict_user = json.load(user_file)
+                dict_user = load(user_file)
 
             all_features = 'money', 'bet', 'box', 'true_answer', 'condition'
             money, bet, box, true_answer, condition = [dict_user.get(features) for features in all_features]
@@ -40,17 +65,8 @@ for event in longpoll.listen():
 
             response_mess = user.response(event.message)
             new_mess(event.user_id, response_mess)
-
+            save(user)
         elif event.text == 'Начать':
             user = User(event.user_id)
             new_mess(event.user_id, menu)
-
-        with open(f"{event.user_id}.json", "w") as file_user:
-            user_dict = {
-                'money': user.money,
-                'bet': user.bet,
-                'box': user.box,
-                'true_answer': user.true_answer,
-                'condition': user.condition,
-            }
-            json.dump(user_dict, file_user)
+            save(user)
