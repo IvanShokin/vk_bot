@@ -1,11 +1,11 @@
 from random import randint
 
-menu = "МЕНЮ\n" \
-       "Начать игру\n" \
-       "💰 Испытать удачу\n" \
-       "Мой кошелек\n" \
-       "Изменить ставку\n" \
-       "Изменить количество коробок\n"
+menu = "Меню:\n" \
+       "1 - 🎰 Начать игру\n" \
+       "2 - 💰 Испытать удачу\n" \
+       "3 - 👛 Мой кошелек\n" \
+       "4 - ⚠ Изменить ставку\n" \
+       "5 - 📦 Изменить количество коробок\n"
 
 
 class User:
@@ -19,11 +19,11 @@ class User:
 
     def menu(self, new_mess):
         command = {
-            'Начать игру': self.game,
-            'Мой кошелек': str(self.money),
-            "Испытать удачу": self.luck,
-            'Изменить ставку': self.new_bet,
-            'Изменить количество коробок': self.new_box_quantity
+            '1': self.game,
+            '2': self.luck,
+            '3': str(self.money),
+            '4': self.new_bet,
+            '5': self.new_box_quantity
         }
         if isinstance(command.get(new_mess), str):
             return command.get(new_mess)
@@ -35,17 +35,17 @@ class User:
         self.true_answer = randint(1, self.box)
         mess = ''
         for box_i in range(self.box):
-            mess += f'{box_i+1} Box\n'
+            mess += f'{box_i + 1} Коробка\n'
         return mess
 
     def answer(self, user_answer):
         self.condition = 'menu'
         if int(user_answer) == self.true_answer:
             self.money += self.bet * self.box
-            return f'Вы выиграли {self.bet * self.box} монет!\n{menu}'
+            return f'Вы выиграли ✅ {self.bet * self.box} монет \n{menu}'
         else:
             self.money -= self.bet
-            return f'Вы проиграли (\n{menu}'
+            return f'Вы проиграли ❌ \n{menu}'
 
     def new_bet(self):
         self.condition = 'new_bet'
@@ -58,20 +58,32 @@ class User:
     def set_new_bet(self, new_bet):
         self.condition = 'menu'
         self.bet = int(new_bet)
-        return 'Меню'
+        return "Успешно✅\n" \
+               "Меню:\n" \
+               "1 - 🎰 Начать игру\n" \
+               "2 - 💰 Испытать удачу\n" \
+               "3 - 👛 Мой кошелек\n" \
+               "4 - ⚠ Изменить ставку\n" \
+               "5 - 📦 Изменить количество коробок\n"
 
     def set_new_box_quantity(self, new_box_quantity):
         self.condition = 'menu'
         self.box = int(new_box_quantity)
-        return 'Меню'
+        return "Успешно✅\n" \
+               "Меню:\n" \
+               "1 - 🎰 Начать игру\n" \
+               "2 - 💰 Испытать удачу\n" \
+               "3 - 👛 Мой кошелек\n" \
+               "4 - ⚠ Изменить ставку\n" \
+               "5 - 📦 Изменить количество коробок\n"
 
     def luck(self):
         if randint(1, 2) == 1:
             self.money += self.bet
-            return f'Вы выиграли {self.bet}!'
+            return f'Вы выиграли ✅ {self.bet}!'
         else:
             self.money -= self.bet
-            return f'Вы проиграли {self.bet}'
+            return f'Вы проиграли ❌ {self.bet}'
 
     def response(self, new_mess):
         all_condition = {

@@ -4,13 +4,12 @@ import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from json import load, dump
 from os.path import isfile
-
+from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 
 with open('config.json', 'r') as file:
     config = load(file)
 
 token = config.get('token')
-
 
 vk = vk_api.VkApi(token=token)
 longpoll = VkLongPoll(vk)
@@ -38,14 +37,11 @@ def save(user_save):
 with open('requests_response.json', 'r') as file:
     requests_response = load(file)
 
-
 print("Начали")
 for event in longpoll.listen():
 
-    # Если пришло новое сообщение и если оно для меня( то есть бота)
     if event.type == VkEventType.MESSAGE_NEW and event.to_me:
 
-        # Полное имя пользователя
         user = vk.method("users.get", {"user_ids": event.user_id})
         fullname = user[0]['first_name'] + ' ' + user[0]['last_name']
 
