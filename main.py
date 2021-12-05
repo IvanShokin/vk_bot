@@ -1,8 +1,9 @@
 from bot import User, menu
 from random import randint
-import vk_api
+from vk_api import VkApi
 from vk_api.longpoll import VkLongPoll, VkEventType
-from json import load, dump
+from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+from json import load, dump, dumps
 from os.path import isfile
 
 
@@ -12,15 +13,39 @@ with open('config.json', 'r') as file:
 token = config.get('token')
 
 
-vk = vk_api.VkApi(token=token)
+vk = VkApi(token=token)
 longpoll = VkLongPoll(vk)
 
 
-def new_mess(user_id, mes_for_user):
+def get_button(text, color):
+    return {
+        'action': {
+            'type': 'text',
+            'payload': "{\"button\": \"" + "1" + "\"}",
+            'label': str(text),
+        },
+        'color': str(color),
+    }
+
+
+def get_keyboard(list_words):
+    buttons = []
+    for word, color in list_words:
+        buttons.append([get_button(word, color)])
+
+    dict_keyboard = {
+        'one_time': False,
+        'buttons': buttons,
+    }
+    return str(dumps(dict_keyboard, ensure_ascii=False).encode('utf-8').decode('utf-8'))
+
+
+def new_mess(user_id, mes_for_user, list_words_color):
     vk.method('messages.send',
               {'user_id': user_id,
                'message': mes_for_user,
-               'random_id': randint(0, 1000000000)})
+               'random_id': randint(0, 1000000000),
+               'keyboard': get_keyboard(list_words_color)})
 
 
 def save(user_save):
@@ -53,7 +78,7 @@ for event in longpoll.listen():
 
         response = requests_response.get(event.text)
         if response:
-            new_mess(event.user_id, response)
+            new_mess(event.user_id, response, menu)
         elif isfile(json_file_name):
             with open(json_file_name, "r") as user_file:
                 dict_user = load(user_file)
@@ -64,9 +89,9 @@ for event in longpoll.listen():
             user = User(event.user_id, money, bet, box, true_answer, condition)
 
             response_mess = user.response(event.message)
-            new_mess(event.user_id, response_mess)
+            new_mess(event.user_id, response_mess, menu)
             save(user)
         elif event.text == 'Начать':
             user = User(event.user_id)
-            new_mess(event.user_id, menu)
+            new_mess(event.user_id, 'Выбери действие', menu)
             save(user)
