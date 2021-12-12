@@ -1,4 +1,4 @@
-from bot import User, menu
+from bot import User, menu, regulations
 from random import randint
 from vk_api import VkApi
 from vk_api.longpoll import VkLongPoll, VkEventType
@@ -34,7 +34,7 @@ def get_keyboard(list_words):
         buttons.append([get_button(word, color)])
 
     dict_keyboard = {
-        'one_time': False,
+        'one_time': True,
         'buttons': buttons,
     }
     return str(dumps(dict_keyboard, ensure_ascii=False).encode('utf-8').decode('utf-8'))
@@ -88,10 +88,10 @@ for event in longpoll.listen():
 
             user = User(event.user_id, money, bet, box, true_answer, condition)
 
-            response_mess = user.response(event.message)
-            new_mess(event.user_id, response_mess, menu)
+            response_mess, keyboard = user.response(event.message)
+            new_mess(event.user_id, response_mess, keyboard)
             save(user)
         elif event.text == 'Начать':
             user = User(event.user_id)
-            new_mess(event.user_id, 'Выбери действие', menu)
+            new_mess(event.user_id, regulations, menu)
             save(user)
