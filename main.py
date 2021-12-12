@@ -1,4 +1,4 @@
-from bot import User, menu
+from bot import User, menu, regulations
 from random import randint
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
@@ -64,5 +64,6 @@ for event in longpoll.listen():
             save(user)
         elif event.text == 'Начать':
             user = User(event.user_id)
+            new_mess(event.user_id, regulations)
             new_mess(event.user_id, menu)
             save(user)
