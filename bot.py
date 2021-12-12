@@ -1,10 +1,10 @@
 from random import randint
 
 menu = [('🎰 Начать игру', 'positive'),
-        ('💰 Испытать удачу', 'primary'),
-        ('👛 Мой кошелек', 'positive'),
-        ('⚠ Изменить ставку', 'secondary'),
-        ('📦 Изменить количество коробок', 'negative')]
+        ('💰 Испытать удачу', 'secondary '),
+        ('👛 Мой кошелек', 'primary '),
+        ('⚠ Изменить ставку', 'negative '),
+        ('📦 Изменить количество коробок', 'primary')]
 
 regulations = "Дорогой друг,как мы видим ты новенький, поэтому вот тебе наши правила игры:\n" \
               "1.Начать играть - это начать играть в обычное Казино\n" \
@@ -13,6 +13,8 @@ regulations = "Дорогой друг,как мы видим ты новень�
               "4.Изменить ставку - это монеты на которые ты играешь\n" \
               "5.Изменить количество коробок - просто можешь поставить меньше коробок и повысить себе шанс угадать))\n" \
               "Приятной игры тебе!\n"
+
+colors = ['primary', 'secondary', 'negative', 'positive']
 
 
 class User:
@@ -65,27 +67,27 @@ class User:
         self.condition = 'new_box_quantity'
         keyboard = []
         for box_i in range(2, 6):
-            button = str(box_i), 'positive'
+            button = str(box_i), randint(colors(0, 3))
             keyboard.append(button)
         return 'Выбери количество коробок', keyboard
 
     def set_new_bet(self, new_bet):
         self.condition = 'menu'
         self.bet = int(new_bet)
-        return 'Ставка изменилась', menu
+        return 'Ставка изменилась ✅', menu
 
     def set_new_box_quantity(self, new_box_quantity):
         self.condition = 'menu'
         self.box = int(new_box_quantity)
-        return 'Изменения внесены', menu
+        return 'Изменения внесены ✅', menu
 
     def luck(self):
         if randint(1, 2) == 1:
             self.money += self.bet
-            return f'Вы выиграли {self.bet}!', menu
+            return f'Вы выиграли ✅ {self.bet}!', menu
         else:
             self.money -= self.bet
-            return f'Вы проиграли {self.bet}', menu
+            return f'Вы проиграли ❌ {self.bet}', menu
 
     def response(self, new_mess):
         all_condition = {
