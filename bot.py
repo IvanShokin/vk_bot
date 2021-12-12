@@ -1,12 +1,10 @@
 from random import randint
 
-menu = "Меню:\n" \
-       "1 - 🎰 Начать игру\n" \
-       "2 - 💰 Испытать удачу\n" \
-       "3 - 👛 Мой кошелек\n" \
-       "4 - ⚠ Изменить ставку\n" \
-       "5 - 📦 Изменить количество коробок\n"
-
+menu = [('🎰 Начать игру', 'primary'),
+        ('💰 Испытать удачу', 'primary'),
+        ('👛 Мой кошелек', 'positive'),
+        ('⚠ Изменить ставку', 'secondary'),
+        ('📦 Изменить количество коробок', 'negative')]
 
 regulations = "Дорогой друг,как мы видим ты новенький, поэтому вот тебе наши правила игры:\n" \
               "1.Начать играть - это начать играть в обычное Казино\n" \
@@ -28,13 +26,13 @@ class User:
 
     def menu(self, new_mess):
         command = {
-            '1': self.game,
-            '2': self.luck,
-            '3': str(self.money),
-            '4': self.new_bet,
-            '5': self.new_box_quantity
+            '🎰 Начать игру': self.game,
+            '💰 Мой кошелек': str(self.money),
+            '👛 Испытать удачу': self.luck,
+            '⚠ Изменить ставку': self.new_bet,
+            '📦 Изменить количество коробок': self.new_box_quantity
         }
-        if isinstance(command.get(new_mess), str):
+        if isinstance(command.get(new_mess), tuple):
             return command.get(new_mess)
         else:
             return command.get(new_mess)()
@@ -42,57 +40,52 @@ class User:
     def game(self):
         self.condition = 'game'
         self.true_answer = randint(1, self.box)
-        mess = ''
+        keyboard = []
         for box_i in range(self.box):
-            mess += f'{box_i + 1} Коробка\n'
-        return mess
+            button = f'{box_i+1} Box', 'primary'
+            keyboard.append(button)
+        return 'Выбери бокс!', keyboard
 
     def answer(self, user_answer):
         self.condition = 'menu'
-        if int(user_answer) == self.true_answer:
+        user_answer = int(user_answer.split()[0])
+
+        if user_answer == self.true_answer:
             self.money += self.bet * self.box
-            return f'Вы выиграли ✅ {self.bet * self.box} монет \n{menu}'
+            return f'Вы выиграли {self.bet * self.box} монет!', menu
         else:
             self.money -= self.bet
-            return f'Вы проиграли ❌ \n{menu}'
+            return f'Вы проиграли {self.bet * self.box} монет(', menu
 
     def new_bet(self):
         self.condition = 'new_bet'
-        return 'Напишите новую ставку'
+        return 'Напишите новую ставку!', []
 
     def new_box_quantity(self):
         self.condition = 'new_box_quantity'
-        return 'Напишите число от 2 до 10'
+        keyboard = []
+        for box_i in range(2, 6):
+            button = str(box_i), 'positive'
+            keyboard.append(button)
+        return 'Выбери количество коробок', keyboard
 
     def set_new_bet(self, new_bet):
         self.condition = 'menu'
         self.bet = int(new_bet)
-        return "Успешно✅\n" \
-               "Меню:\n" \
-               "1 - 🎰 Начать игру\n" \
-               "2 - 💰 Испытать удачу\n" \
-               "3 - 👛 Мой кошелек\n" \
-               "4 - ⚠ Изменить ставку\n" \
-               "5 - 📦 Изменить количество коробок\n"
+        return 'Ставка изменилась', menu
 
     def set_new_box_quantity(self, new_box_quantity):
         self.condition = 'menu'
         self.box = int(new_box_quantity)
-        return "Успешно✅\n" \
-               "Меню:\n" \
-               "1 - 🎰 Начать игру\n" \
-               "2 - 💰 Испытать удачу\n" \
-               "3 - 👛 Мой кошелек\n" \
-               "4 - ⚠ Изменить ставку\n" \
-               "5 - 📦 Изменить количество коробок\n"
+        return 'Изменения внесены', menu
 
     def luck(self):
         if randint(1, 2) == 1:
             self.money += self.bet
-            return f'Вы выиграли ✅ {self.bet}!'
+            return f'Вы выиграли {self.bet}!', menu
         else:
             self.money -= self.bet
-            return f'Вы проиграли ❌ {self.bet}'
+            return f'Вы проиграли {self.bet}', menu
 
     def response(self, new_mess):
         all_condition = {
@@ -103,5 +96,3 @@ class User:
         }
 
         return all_condition.get(self.condition)(new_mess)
-
-
